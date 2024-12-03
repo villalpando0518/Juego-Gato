@@ -1,0 +1,336 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Gato</title>
+
+        <style>
+            body {
+                text-align: center;
+                background-color: #121212;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas
+            id="myCanvas"
+            width="500"
+            height="500"
+            style="border: 3px solid #78cdd7"
+        >
+            Tu navegador no soporta la etiqueta Canvas
+        </canvas>
+
+        <script>
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            const w = c.width; //Ancho del tablero
+            const h = c.height; // Alto del tablero
+            var x = 0;
+            var y = 0;
+            var turnoX = true; // inician las equis
+            var ganador = 0; //1 ganan X, 2 ganan O
+
+            //Para dibujar la linea ganadora
+            var linea_ganadora = 0;
+            //1,2,3 son lineas verticales
+            //4,5,6 son lineas horizontales
+            //7,8 lineas diagonales
+
+            d_tablero();
+            c.addEventListener("click", turno);
+
+            // tablero vacío, 1 para las "x", 2 para las "o"
+            tablero = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+            ];
+
+            //Dibuja una linea en el canva. Para trazar el tablero y las equis
+            function linea(a1, a2, b1, b2, color) {
+                ctx.beginPath();
+                ctx.moveTo(a1, a2);
+                ctx.lineTo(b1, b2);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = color;
+                ctx.stroke();
+            }
+
+            //Dibuja el tablero
+            function d_tablero() {
+                linea(w / 3, 0, w / 3, h, "#AF9BB6"); //primera linea vertical
+                linea((2 * w) / 3, 0, (2 * w) / 3, h, "#AF9BB6"); //segunda linea vertical
+                linea(0, h / 3, w, h / 3, "#AF9BB6"); //primera linea horizontal
+                linea(0, (2 * h) / 3, w, (2 * h) / 3, "#AF9BB6"); //segunda linea horizontal
+            }
+
+            //Dibuja una equis
+            function equis(x, y) {
+                // 0,0 traza equis en la primera casilla
+                const colchon = w / 3 / 10; //colchon de 20%, 10% viene del lugar donde se da cilck
+                const longitud = w / 3 - colchon * 3; //colchon final del 20%
+
+                var a1 = x + colchon;
+                var a2 = y + colchon;
+                var b1 = x + longitud;
+                var b2 = y + longitud;
+                linea(a1, a2, b1, b2, "#44AF69");
+                linea(b1, a2, a1, b2, "#44AF69");
+            }
+
+            //Dibuja una O
+            function circulo(x, y) {
+                //Centro para la cordenada x. x:inicio de la casilla, (w/6): mitad de una casilla para llegar al centro, (w/30): colchon
+                var a = x + w / 6 - w / 30;
+                var b = y + w / 6 - w / 30;
+                var r = w / 10;
+
+                ctx.beginPath();
+                ctx.arc(a, b, r, 0, 2 * Math.PI);
+                ctx.strokeStyle = "#E4572E";
+                ctx.stroke();
+            }
+
+            //Juega un turno
+            function turno(event) {
+                var x = event.offsetX;
+                var y = event.offsetY;
+
+                const inicio_casilla1 = w / 30;
+                const fin_casilla1 = w / 3 - inicio_casilla1;
+                const inicio_casilla2 = inicio_casilla1 + w / 3;
+                const fin_casilla2 = fin_casilla1 + w / 3;
+                const inicio_casilla3 = inicio_casilla2 + w / 3;
+                const fin_casilla3 = fin_casilla2 + w / 3;
+                //las casillas tienen una zona sin registro en las orillas
+
+                if (ganador == 0) {
+                    if (x > inicio_casilla1 && x < fin_casilla1) {
+                        //Primera columna
+                        if (y > inicio_casilla1 && y < fin_casilla1) {
+                            if (tablero[0][0] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla1, inicio_casilla1);
+                                    tablero[0][0] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla1, inicio_casilla1);
+                                    tablero[0][0] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                        if (y > inicio_casilla2 && y < fin_casilla2) {
+                            if (tablero[0][1] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla1, inicio_casilla2);
+                                    tablero[0][1] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla1, inicio_casilla2);
+                                    tablero[0][1] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                        if (y > inicio_casilla3 && y < fin_casilla3) {
+                            if (tablero[0][2] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla1, inicio_casilla3);
+                                    tablero[0][2] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla1, inicio_casilla3);
+                                    tablero[0][2] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (x > inicio_casilla2 && x < fin_casilla2) {
+                        //Segunda columna
+                        if (y > inicio_casilla1 && y < fin_casilla1) {
+                            if (tablero[1][0] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla2, inicio_casilla1);
+                                    tablero[1][0] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla2, inicio_casilla1);
+                                    tablero[1][0] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                        if (y > inicio_casilla2 && y < fin_casilla2) {
+                            if (tablero[1][1] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla2, inicio_casilla2);
+                                    tablero[1][1] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla2, inicio_casilla2);
+                                    tablero[1][1] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                        if (y > inicio_casilla3 && y < fin_casilla3) {
+                            if (tablero[1][2] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla2, inicio_casilla3);
+                                    tablero[1][2] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla2, inicio_casilla3);
+                                    tablero[1][2] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (x > inicio_casilla3 && x < fin_casilla3) {
+                        //Tercera columna
+                        if (y > inicio_casilla1 && y < fin_casilla1) {
+                            if (tablero[2][0] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla3, inicio_casilla1);
+                                    tablero[2][0] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla3, inicio_casilla1);
+                                    tablero[2][0] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                        if (y > inicio_casilla2 && y < fin_casilla2) {
+                            if (tablero[2][1] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla3, inicio_casilla2);
+                                    tablero[2][1] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla3, inicio_casilla2);
+                                    tablero[2][1] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                        if (y > inicio_casilla3 && y < fin_casilla3) {
+                            if (tablero[2][2] == 0) {
+                                if (turnoX) {
+                                    equis(inicio_casilla3, inicio_casilla3);
+                                    tablero[2][2] = 1;
+                                    turnoX = false;
+                                } else {
+                                    circulo(inicio_casilla3, inicio_casilla3);
+                                    tablero[2][2] = 2;
+                                    turnoX = true;
+                                }
+                            }
+                        }
+                    }
+
+                    buscar_ganador();
+                    if (ganador != 0) {
+                        console.log(ganador);
+                        console.log(linea_ganadora);
+                        l_ganadora(linea_ganadora);
+                    }
+                }
+            }
+
+            function buscar_ganador() {
+                //revisar ambos jugadores
+                for (jugador = 1; jugador <= 2; jugador++) {
+                    //revisar filas
+                    for (i = 0; i <= 2; i++) {
+                        if (
+                            tablero[i][0] == jugador &&
+                            tablero[i][1] == jugador &&
+                            tablero[i][2] == jugador
+                        ) {
+                            ganador = jugador;
+                            linea_ganadora = i + 1;
+                        }
+                    }
+                    //revisar columnas
+                    for (i = 0; i <= 2; i++) {
+                        if (
+                            tablero[0][i] == jugador &&
+                            tablero[1][i] == jugador &&
+                            tablero[2][i] == jugador
+                        ) {
+                            ganador = jugador;
+                            linea_ganadora = i + 4;
+                        }
+                    }
+                    //revisar diagonal 1
+                    if (
+                        tablero[0][0] == jugador &&
+                        tablero[1][1] == jugador &&
+                        tablero[2][2] == jugador
+                    ) {
+                        ganador = jugador;
+                        linea_ganadora = 7;
+                    }
+                    //revisar diagonal 2
+                    if (
+                        tablero[0][2] == jugador &&
+                        tablero[1][1] == jugador &&
+                        tablero[2][0] == jugador
+                    ) {
+                        ganador = jugador;
+                        linea_ganadora = 8;
+                    }
+                }
+            }
+
+            //Dibuja la linea ganadora
+            function l_ganadora(i) {
+                switch (i) {
+                    case 1:
+                        linea(w / 6, w / 24, w / 6, h - w / 24, "white");
+                        break;
+                    case 2:
+                        linea(w / 2, w / 24, w / 2, h - w / 24, "white");
+                        break;
+                    case 3:
+                        linea(
+                            (5 * w) / 6,
+                            w / 24,
+                            (5 * w) / 6,
+                            h - w / 24,
+                            "white",
+                        );
+                        break;
+                    case 4:
+                        linea(w / 24, w / 6, h - w / 24, w / 6, "white");
+                        break;
+                    case 5:
+                        linea(w / 24, w / 2, h - w / 24, w / 2, "white");
+                        break;
+                    case 6:
+                        linea(
+                            w / 24,
+                            (5 * w) / 6,
+                            h - w / 24,
+                            (5 * w) / 6,
+                            "white",
+                        );
+                        break;
+                    case 7:
+                        linea(w / 24, h / 24, w - w / 24, h - h / 24, "White");
+                        break;
+                    case 8:
+                        linea(w - w / 24, h / 24, w / 24, h - h / 24, "white");
+                        break;
+                }
+            }
+        </script>
+    </body>
+</html>
